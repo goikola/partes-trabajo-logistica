@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#174f7a">
+  <meta name="description" content="Parte de trabajo para conductores de Erdella Logística">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css?v=8">
+  <title>Partes de trabajo · Erdella Logística</title>
+</head>
+<body class="auth-locked">
+  <section id="loginScreen" class="login-screen" aria-labelledby="loginTitle">
+    <div class="login-card">
+      <div class="login-mark" aria-hidden="true">✓</div>
+      <p class="eyebrow login-eyebrow">ERDELLA LOGÍSTICA</p>
+      <h1 id="loginTitle">Acceso a partes de trabajo</h1>
+      <p>Identifícate la primera vez. Este dispositivo recordará el acceso.</p>
+      <form id="loginForm">
+        <label>
+          <span>Usuario</span>
+          <input id="loginUser" type="text" autocomplete="username" required>
+        </label>
+        <label>
+          <span>Contraseña</span>
+          <input id="loginPassword" type="password" autocomplete="current-password" inputmode="numeric" required>
+        </label>
+        <div id="loginError" class="message login-error" role="alert" hidden></div>
+        <button class="primary" type="submit">Entrar</button>
+      </form>
+    </div>
+  </section>
+
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">ERDELLA LOGÍSTICA</p>
+      <h1>Parte de trabajo</h1>
+    </div>
+    <button id="installButton" class="secondary compact" hidden>Instalar</button>
+  </header>
+
+  <main>
+    <nav class="app-tabs" aria-label="Secciones de la aplicación">
+      <button id="workTabButton" class="app-tab active" type="button">Partes</button>
+      <button id="adminTabButton" class="app-tab" type="button">Administración</button>
+    </nav>
+
+    <div id="workView">
+    <section class="panel form-panel" aria-labelledby="formTitle">
+      <div class="section-heading">
+        <div>
+          <h2 id="formTitle">Nueva jornada</h2>
+          <p>El borrador se guarda automáticamente en este dispositivo.</p>
+        </div>
+        <button id="newButton" class="text-button" type="button">Limpiar</button>
+      </div>
+
+      <div id="cloudStatus" class="message" role="status">Comprobando la copia de seguridad…</div>
+
+      <form id="workForm">
+        <input id="recordId" type="hidden">
+        <div class="form-grid">
+          <label>
+            <span>Fecha</span>
+            <input id="date" type="date" required>
+          </label>
+          <label>
+            <span>Nombre / conductor</span>
+            <select id="worker" required>
+              <option value="">Seleccionar trabajador…</option>
+            </select>
+          </label>
+          <label class="main-detail-field">
+            <span>Matrícula</span>
+            <select id="vehicle" required>
+              <option value="">Seleccionar matrícula…</option>
+            </select>
+          </label>
+          <label class="wide">
+            <span>Tareas</span>
+            <select id="task" required>
+              <option value="">Seleccionar tarea…</option>
+              <option value="Varios">Varios</option>
+              <option value="Eroski">Eroski</option>
+              <option value="STEF">STEF</option>
+              <option value="Barroso">Barroso</option>
+              <option value="Integra">Integra</option>
+              <option value="Recogidas">Recogidas</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </label>
+          <label id="taskOtherLabel" class="wide" hidden>
+            <span>Especificar otra tarea</span>
+            <input id="taskOther" type="text" autocomplete="off" placeholder="Escribe la tarea">
+          </label>
+          <label class="main-detail-field">
+            <span>Hora inicio</span>
+            <input id="startTime" class="start-field" type="time" required>
+          </label>
+          <label class="main-detail-field">
+            <span>Hora fin</span>
+            <input id="endTime" class="end-field" type="time" required>
+          </label>
+          <label class="main-detail-field">
+            <span>Km iniciales</span>
+            <input id="startKm" type="number" min="0" step="1" inputmode="numeric" required>
+          </label>
+          <label class="main-detail-field">
+            <span>Km finales</span>
+            <input id="endKm" type="number" min="0" step="1" inputmode="numeric" required>
+          </label>
+          <fieldset id="multipleService" class="wide multiple-service" hidden>
+            <legend>Servicios adicionales</legend>
+            <p>Añade tantas líneas como necesites. «Varios» no aparece dentro de estas líneas.</p>
+            <div id="serviceLines" class="service-lines"></div>
+            <button id="addServiceLine" class="secondary add-service-line" type="button">Añadir otra línea</button>
+          </fieldset>
+          <label class="wide">
+            <span>Observaciones</span>
+            <textarea id="notes" rows="2" placeholder="Opcional"></textarea>
+          </label>
+        </div>
+
+        <div class="calculated" aria-live="polite">
+          <div><span>Horas</span><strong id="duration">—</strong></div>
+          <div><span>Km realizados</span><strong id="distance">—</strong></div>
+        </div>
+
+        <div id="formMessage" class="message" role="status" hidden></div>
+        <button class="primary save-button" type="submit">Guardar parte</button>
+      </form>
+
+      <template id="serviceLineTemplate">
+        <section class="service-line">
+          <div class="service-line-heading">
+            <strong class="service-line-title">Servicio adicional</strong>
+            <button class="remove-service-line danger-button" type="button">Quitar línea</button>
+          </div>
+          <div class="form-grid sub-service-grid">
+            <label>
+              <span>Matrícula</span>
+              <select class="service-vehicle" required></select>
+            </label>
+            <label>
+              <span>Tareas</span>
+              <select class="service-task" required>
+                <option value="">Seleccionar tarea…</option>
+                <option value="Eroski">Eroski</option>
+                <option value="STEF">STEF</option>
+                <option value="Barroso">Barroso</option>
+                <option value="Integra">Integra</option>
+                <option value="Recogidas">Recogidas</option>
+                <option value="Otros">Otros</option>
+              </select>
+            </label>
+            <label class="wide service-task-other-label" hidden>
+              <span>Especificar otra tarea</span>
+              <input class="service-task-other" type="text" autocomplete="off" placeholder="Escribe la tarea">
+            </label>
+            <label>
+              <span>Hora inicio</span>
+              <input class="service-start-time start-field" type="time" required>
+            </label>
+            <label>
+              <span>Hora fin</span>
+              <input class="service-end-time end-field" type="time" required>
+            </label>
+            <label>
+              <span>Km iniciales</span>
+              <input class="service-start-km" type="number" min="0" step="1" inputmode="numeric" required>
+            </label>
+            <label>
+              <span>Km finales</span>
+              <input class="service-end-km" type="number" min="0" step="1" inputmode="numeric" required>
+            </label>
+          </div>
+          <div class="calculated extra-calculated" aria-live="polite">
+            <div><span>Horas</span><strong class="service-duration">—</strong></div>
+            <div><span>Km realizados</span><strong class="service-distance">—</strong></div>
+          </div>
+        </section>
+      </template>
+    </section>
+
+    <section class="panel records-panel" aria-labelledby="recordsTitle">
+      <div class="section-heading">
+        <div>
+          <h2 id="recordsTitle">Partes guardados</h2>
+          <p id="recordCount">0 registros</p>
+        </div>
+      </div>
+      <div class="filters">
+        <label>
+          <span>Filtrar por mes</span>
+          <input id="monthFilter" type="month">
+        </label>
+        <button id="clearFilter" class="secondary" type="button">Ver todos</button>
+      </div>
+      <div id="recordsList" class="records-list"></div>
+      <div id="emptyState" class="empty-state">
+        <strong>Aún no hay partes</strong>
+        <span>Guarda la primera jornada usando el formulario.</span>
+      </div>
+      <div class="actions">
+        <button id="exportButton" class="primary" type="button">Exportar a Excel</button>
+      </div>
+    </section>
+    </div>
+
+    <section id="adminView" class="panel admin-panel" aria-labelledby="adminTitle" hidden>
+      <div class="section-heading">
+        <div>
+          <h2 id="adminTitle">Administración</h2>
+          <p>Gestiona las listas de trabajadores y camiones de esta aplicación.</p>
+        </div>
+      </div>
+
+      <form id="adminLoginForm" class="admin-login">
+        <label>
+          <span>Usuario administrador</span>
+          <input id="adminUser" type="text" autocomplete="username" placeholder="iurdana" required>
+        </label>
+        <label>
+          <span>Clave</span>
+          <input id="adminPassword" type="password" autocomplete="current-password" inputmode="numeric" required>
+        </label>
+        <div id="adminLoginError" class="message login-error" role="alert" hidden></div>
+        <button class="primary" type="submit">Entrar en administración</button>
+      </form>
+
+      <div id="adminManager" hidden>
+        <form id="adminWorkerForm" class="admin-add-form">
+          <label>
+            <span>Nuevo trabajador</span>
+            <input id="adminWorkerName" type="text" autocomplete="off" placeholder="APELLIDOS Y NOMBRE" required>
+          </label>
+          <button class="primary" type="submit">Añadir trabajador</button>
+        </form>
+        <div id="adminMessage" class="message" role="status" hidden></div>
+        <div class="admin-list-heading">
+          <strong>Trabajadores</strong>
+          <span id="adminWorkerCount"></span>
+        </div>
+        <div id="adminWorkerList" class="admin-worker-list"></div>
+        <button id="resetWorkersButton" class="secondary admin-reset" type="button">Restablecer trabajadores originales</button>
+
+        <hr class="admin-divider">
+
+        <form id="adminVehicleForm" class="admin-add-form admin-vehicle-form">
+          <label>
+            <span>Nueva matrícula</span>
+            <input id="adminVehiclePlate" type="text" autocomplete="off" autocapitalize="characters" placeholder="1234ABC" required>
+          </label>
+          <button class="primary" type="submit">Añadir camión</button>
+        </form>
+        <div class="admin-list-heading">
+          <strong>Camiones</strong>
+          <span id="adminVehicleCount"></span>
+        </div>
+        <div id="adminVehicleList" class="admin-worker-list"></div>
+        <button id="resetVehiclesButton" class="secondary admin-reset" type="button">Restablecer camiones originales</button>
+      </div>
+    </section>
+  </main>
+
+  <template id="recordTemplate">
+    <article class="record-card">
+      <div class="record-top">
+        <div>
+          <strong class="record-date"></strong>
+          <span class="record-worker"></span>
+        </div>
+        <span class="record-plate"></span>
+      </div>
+      <p class="record-task"></p>
+      <div class="record-metrics">
+        <span><b class="record-time"></b><small>Horario</small></span>
+        <span><b class="record-duration"></b><small>Duración</small></span>
+        <span><b class="record-km"></b><small>Kilómetros</small></span>
+      </div>
+      <div class="record-extra" hidden>
+        <strong>Segundo servicio</strong>
+        <span class="record-extra-detail"></span>
+      </div>
+      <p class="record-notes"></p>
+      <div class="record-actions">
+        <button class="edit-record text-button" type="button">Editar</button>
+        <button class="share-record text-button" type="button">Compartir</button>
+        <button class="delete-record danger-button" type="button">Eliminar</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+  <script src="data.js?v=1"></script>
+  <script src="xlsx-export.js?v=9"></script>
+  <script src="app.js?v=1"></script>
+</body>
+</html>

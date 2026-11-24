@@ -1,0 +1,15 @@
+{
+  "name": "Partes de trabajo · Erdella Logística",
+  "short_name": "Erdella Logística",
+  "description": "Registro móvil de rutas, horas y kilómetros",
+  "lang": "es",
+  "start_url": "./?v=1",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f3f6f8",
+  "theme_color": "#174f7a",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
