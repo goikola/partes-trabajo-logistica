@@ -13,7 +13,17 @@
   const ACCESS_PASSWORD_HASH = "7907a88d77f29a7681a0dc6c89157ea3f45959944436301085c8a34a46fe4a77";
   const ADMIN_USER = "iurdana";
   const ADMIN_PASSWORD_HASH = "4c3aada37cf7fd3819b2da502a15f78f7ce5a2ce6d584b630344ff00dffc74ac";
-  const TASK_OPTIONS = ["Varios", "Eroski", "STEF", "Barroso", "Integra", "Recogidas", "Otros"];
+  const TASK_OPTIONS = ["Varios", "Eroski tiendas", "Elorrio", "AN", "Castellana", "Eroski Jundiz", "Eroski Zubieta", "Transito"];
+  function selectSavedTask(select, value, service = false) {
+    select.querySelector("option[data-legacy-task]")?.remove();
+    if (value && !TASK_OPTIONS.includes(value) && ![...select.options].some(option => option.value === value)) {
+      const option = new Option(value, value);
+      option.hidden = true;
+      option.dataset.legacyTask = "";
+      select.add(option);
+    }
+    select.value = service && value === "Varios" ? "" : (value || "");
+  }
   const FIREBASE_CONFIG = {
     apiKey: "AIzaSyBjT_49FR1Fxq6kuph4n8L2SGje1WxYxJs",
     authDomain: "partes-trabajo-erdella.firebaseapp.com",
@@ -377,7 +387,7 @@
       fields.id.value = draft.id || "";
       fields.date.value = draft.date || todayLocal();
       fields.worker.value = draft.worker || "";
-      fields.task.value = TASK_OPTIONS.includes(draft.task) ? draft.task : "";
+      selectSavedTask(fields.task, draft.task);
       fields.taskOther.value = draft.taskOther || "";
       fields.notes.value = draft.notes || "";
       toggleTaskOther();
@@ -467,7 +477,7 @@
     const line = $("serviceLineTemplate").content.firstElementChild.cloneNode(true);
     const vehicle = line.querySelector(".service-vehicle");
     fillServiceVehicleSelect(vehicle, data.vehicle || "");
-    line.querySelector(".service-task").value = data.task || "";
+    selectSavedTask(line.querySelector(".service-task"), data.task, true);
     line.querySelector(".service-task-other").value = data.taskOther || "";
     line.querySelector(".service-start-time").value = data.startTime || "";
     line.querySelector(".service-end-time").value = data.endTime || "";
@@ -641,8 +651,8 @@
     fields.id.value = record.id;
     $("formTitle").textContent = "Editar jornada";
     const previousTask = record.task || record.route || "";
-    fields.task.value = TASK_OPTIONS.includes(previousTask) ? previousTask : "Otros";
-    fields.taskOther.value = record.taskOther || (fields.task.value === "Otros" ? previousTask : "");
+    selectSavedTask(fields.task, previousTask);
+    fields.taskOther.value = record.taskOther || "";
     toggleTaskOther();
     toggleMultipleService();
     if (fields.task.value === "Varios") {
@@ -859,13 +869,29 @@
     }
   });
 
+  const installButton = $("installButton");
+  installButton.hidden = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
   window.addEventListener("beforeinstallprompt", event => {
-    event.preventDefault(); deferredInstallPrompt = event; $("installButton").hidden = false;
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    installButton.hidden = false;
   });
-  $("installButton").addEventListener("click", async () => {
-    if (!deferredInstallPrompt) return;
-    deferredInstallPrompt.prompt(); await deferredInstallPrompt.userChoice;
-    deferredInstallPrompt = null; $("installButton").hidden = true;
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    installButton.hidden = true;
+  });
+  installButton.addEventListener("click", async () => {
+    const prompt = deferredInstallPrompt;
+    deferredInstallPrompt = null;
+    if (prompt) {
+      try {
+        await prompt.prompt();
+        const choice = await prompt.userChoice;
+        if (choice.outcome === "accepted") installButton.hidden = true;
+        return;
+      } catch {}
+    }
+    alert("En Android, abre este enlace en Chrome. Pulsa ⋮, luego «Añadir a pantalla de inicio» y elige «Instalar» si aparece. Si solo ves «Crear acceso directo», puedes añadir un icono sin instalar la app.");
   });
   if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
 })();

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#174f7a">
   <meta name="description" content="Parte de trabajo para conductores de Erdella Logística">
-  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="manifest.webmanifest?v=3">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css?v=8">
   <title>Partes de trabajo · Erdella Logística</title>
@@ -37,7 +37,7 @@
       <p class="eyebrow">ERDELLA LOGÍSTICA</p>
       <h1>Parte de trabajo</h1>
     </div>
-    <button id="installButton" class="secondary compact" hidden>Instalar</button>
+    <button id="installButton" class="secondary compact" type="button">Instalar aplicación</button>
   </header>
 
   <main>
@@ -82,12 +82,13 @@
             <select id="task" required>
               <option value="">Seleccionar tarea…</option>
               <option value="Varios">Varios</option>
-              <option value="Eroski">Eroski</option>
-              <option value="STEF">STEF</option>
-              <option value="Barroso">Barroso</option>
-              <option value="Integra">Integra</option>
-              <option value="Recogidas">Recogidas</option>
-              <option value="Otros">Otros</option>
+              <option value="Eroski tiendas">Eroski tiendas</option>
+              <option value="Elorrio">Elorrio</option>
+              <option value="AN">AN</option>
+              <option value="Castellana">Castellana</option>
+              <option value="Eroski Jundiz">Eroski Jundiz</option>
+              <option value="Eroski Zubieta">Eroski Zubieta</option>
+              <option value="Transito">Transito</option>
             </select>
           </label>
           <label id="taskOtherLabel" class="wide" hidden>
@@ -146,12 +147,13 @@
               <span>Tareas</span>
               <select class="service-task" required>
                 <option value="">Seleccionar tarea…</option>
-                <option value="Eroski">Eroski</option>
-                <option value="STEF">STEF</option>
-                <option value="Barroso">Barroso</option>
-                <option value="Integra">Integra</option>
-                <option value="Recogidas">Recogidas</option>
-                <option value="Otros">Otros</option>
+                <option value="Eroski tiendas">Eroski tiendas</option>
+                <option value="Elorrio">Elorrio</option>
+                <option value="AN">AN</option>
+                <option value="Castellana">Castellana</option>
+                <option value="Eroski Jundiz">Eroski Jundiz</option>
+                <option value="Eroski Zubieta">Eroski Zubieta</option>
+                <option value="Transito">Transito</option>
               </select>
             </label>
             <label class="wide service-task-other-label" hidden>
@@ -297,6 +299,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
   <script src="data.js?v=1"></script>
   <script src="xlsx-export.js?v=9"></script>
-  <script src="app.js?v=1"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
